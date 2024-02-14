@@ -1,0 +1,7 @@
+id = "microshift-{{ microshift_generate_iso_microshift_version }}"
+name = "Microshift {{ microshift_generate_iso_microshift_version }}"
+type = "yum-baseurl"
+url = "{{ microshift_generate_iso_microshift_repo_url }}/el{{ ansible_distribution_major_version }}/os"
+check_gpg = false
+check_ssl = true
+system = false

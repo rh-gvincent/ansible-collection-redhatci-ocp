@@ -1,0 +1,30 @@
+---
+- name: Setup Repositories
+  community.general.rhsm_repository:
+    state: enabled
+    purge: yes
+    name:
+      - rhel-{{ ansible_distribution_major_version }}-for-x86_64-appstream-rpms
+      - rhel-{{ ansible_distribution_major_version }}-for-x86_64-baseos-rpms
+
+- name: Install Packages needed by the composer-cli
+  ansible.builtin.dnf:
+    state: latest
+    name:
+      - osbuild-composer
+      - composer-cli
+      - cockpit-composer
+      - bash-completion
+      - firewalld
+      - podman
+      - lorax
+
+- name: Enable Cockpit/Composer/Firewalld
+  ansible.builtin.systemd:
+    state: started
+    enabled: yes
+    name: "{{ item }}"
+  loop:
+    - osbuild-composer.socket
+    - cockpit.socket
+...

@@ -1,0 +1,8 @@
+id = "rhocp-{{ microshift_generate_iso_microshift_version }}"
+name = "Red Hat OpenShift Container Platform {{ microshift_generate_iso_microshift_version }} for RHEL {{ ansible_distribution_major_version }}"
+type = "yum-baseurl"
+url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ ansible_architecture }}/rhocp/{{ microshift_generate_iso_microshift_version }}/os"
+check_gpg = true
+check_ssl = true
+system = false
+rhsm = true

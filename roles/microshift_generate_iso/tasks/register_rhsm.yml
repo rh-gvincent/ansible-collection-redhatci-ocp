@@ -1,0 +1,15 @@
+---
+- name: Register Host with username/password
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rhsm_username }}"
+    password: "{{ rhsm_password }}"
+  when: rhsm_username is defined
+
+- name: Register Host with activation key
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ rhsm_activation_key }}"
+    org_id: "{{ rhsm_org_id }}"
+  when: rhsm_org_id is defined and rhsm_activation_key is defined
+...
