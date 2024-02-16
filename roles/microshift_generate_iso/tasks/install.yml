@@ -1,5 +1,4 @@
 ---
-- include_tasks: register_rhsm.yml
 - include_tasks: install_packages.yml
 - include_tasks: create_dirs.yml
 - include_tasks: register_source.yml
