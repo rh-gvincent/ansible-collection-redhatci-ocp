@@ -2,7 +2,7 @@
 - name: Create the rhocp toml file needed by Microshift
   ansible.builtin.template:
     src: rhocp.toml.j2
-    dest: "{{ microshift_generate_iso_folder_blueprints_dir }}/rhocp-{{ microshift_generate_iso_microshift_version }}.toml"
+    dest: "{{ microshift_generate_iso_folder_blueprints_dir }}/rhocp.toml"
     mode: '0644'
 
 - name: Create the fast-datapath.toml file needed by Microshift
