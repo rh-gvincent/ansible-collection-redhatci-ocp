@@ -1,0 +1,29 @@
+---
+- name: Setup host environment
+  become: true
+  block:
+    - name: "Install virt-manager"
+      package:
+        name: "{{ virt_packages }}"
+        state: present
+
+    - name: Start libvirtd
+      service:
+        name: libvirtd
+        state: started
+
+- name: Start the default virsh network
+  become: true
+  community.libvirt.virt_net:
+    name: default
+    state: active
+
+- name: Cleanup previous RHDE VM / Image
+  import_tasks: cleanup_rhde_builder.yml
+
+- name: Prepare RHDE virt image
+  import_tasks: prepare_rhde_virt_image.yml
+
+- name: Start RHDE builder VM
+  import_tasks: start_rhde_builder_vm.yml
+...
