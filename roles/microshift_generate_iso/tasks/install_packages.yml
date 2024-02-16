@@ -18,6 +18,7 @@
       - firewalld
       - podman
       - lorax
+      - rsync
 
 - name: Enable Cockpit/Composer/Firewalld
   ansible.builtin.systemd:
