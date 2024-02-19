@@ -9,7 +9,7 @@
       --network bridge=virbr0,model=virtio
       --os-variant=rhel{{ rhde_builder_rhel_version }}
       --nographics --noautoconsole --import
-      --cloud-init root-ssh-key={{ rhde_builder_ssh_pubkey }},disable=off,clouduser-ssh-key={{ rhde_builder_ssh_pubkey }}
+      --cloud-init ssh-key={{ rhde_builder_ssh_pubkey }},disable=no
 
 - name: Wait for domain {{ rhde_builder_vm_name }} to be started
   become: true
