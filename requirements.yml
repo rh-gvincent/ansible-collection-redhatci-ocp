@@ -4,6 +4,7 @@ collections:
   - ansible.utils
   - community.crypto
   - community.general
+    version: ">=6.0.0"
   - community.kubernetes
   - community.libvirt
   - containers.podman
