@@ -1,0 +1,102 @@
+- name: Install sushy-tools
+  become: true
+  block:
+    - name: Install required packages
+      package: # noqa: jinja[spacing]
+        name: "{{ sushy_packages | default(
+            (is_on_rhel9 | bool) | ternary(sushy_packages_rhel9, sushy_packages_rhel8)
+          ) }}"
+        state: present
+
+    - name: "Create sushy-tools directory {{ item }}"
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - "{{ sushy_dir }}"
+        - "{{ sushy_auth_dir }}"
+        - "{{ sushy_cert_dir }}"
+        - "{{ sushy_data_dir }}"
+
+    - name: Install sushy-tools via pip in a virtual environment
+      pip:
+        name: "{{ sushy_pip_packages }}"
+        virtualenv_command: "{{ (is_on_rhel9 | bool) | ternary('python3 -m venv', omit) }}"
+        virtualenv: "{{ sushy_dir }}"
+
+    - name: Install httpd-tools for htpasswd
+      package:
+        name: httpd-tools
+        state: present
+
+    - name: Add TCP firewall rules for VM bridge
+      firewalld:
+        port: "{{ item.0 }}/tcp"
+        state: enabled
+        zone: "{{ item.1 }}"
+        permanent: yes
+        immediate: yes
+      loop: "{{ [sushy_tools_port] | product(['internal', 'public']) | list }}"
+
+    - name: Generate htpasswd entry
+      command: htpasswd -bBn {{ bmc_user }} {{ bmc_password }}
+      register: htpass_entries
+      changed_when: false
+
+    - name: Write htpasswd file
+      copy:
+        content: "{{ htpass_entries.stdout }}"
+        dest: "{{ sushy_auth_file }}"
+        owner: "{{ file_owner }}"
+        group: "{{ file_group }}"
+        mode: 0660
+        backup: yes
+        force: yes
+      become: True
+
+    - name: Set X86_64 OVMF code path
+      set_fact:
+        sushy_x86_64_ovmf_code_path: "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
+
+    - name: Check x86_64 OVMF code path
+      stat:
+        path: "/usr/share/OVMF/OVMF_CODE.secboot.fd"
+      register: OVMF_X86_64_CODE_STAT
+
+    - name: Set x86_64 OVMF code path (legacy)
+      set_fact:
+        sushy_x86_64_ovmf_code_path: "/usr/share/OVMF/OVMF_CODE.secboot.fd"
+      when:
+        - OVMF_X86_64_CODE_STAT.stat.exists
+        - not OVMF_X86_64_CODE_STAT.stat.islnk
+
+    - name: Create sushy-tools conf
+      template:
+        src: sushy-emulator.conf.j2
+        dest: "{{ sushy_dir }}/sushy-emulator.conf"
+        mode: 0664
+
+    - name: Create sushy-tools service
+      template:
+        src: sushy-tools.service.j2
+        dest: /etc/systemd/system/sushy-tools.service
+        mode: 0664
+
+    - name: Reload systemd service
+      systemd:
+        daemon_reexec: yes
+
+    - name: Start sushy-tools service
+      service:
+        name: sushy-tools
+        state: restarted
+        enabled: yes
+
+    - name: Check sushy-tools service is active
+      service:
+        name: sushy-tools
+      register: sushy_service_result
+      until: "'active' in sushy_service_result.status.ActiveState"
+      retries: 10
+      delay: 5

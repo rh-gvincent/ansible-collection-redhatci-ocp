@@ -1,0 +1,4 @@
+---
+boot_iso_url: "{{ discovery_iso_server }}/{{ discovery_iso_name }}"
+base_bmc_address: "http://{{ bmc_address }}"
+vm_name: "{{ target_host }}"
