@@ -1,0 +1,3 @@
+---
+- import_tasks: "{{ microshift_generate_iso_action }}.yml"
+...
