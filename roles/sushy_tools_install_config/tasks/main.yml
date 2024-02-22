@@ -2,9 +2,9 @@
   become: true
   block:
     - name: Install required packages
-      package: # noqa: jinja[spacing]
+      package:
         name: "{{ sushy_packages | default(
-            (is_on_rhel9 | bool) | ternary(sushy_packages_rhel9, sushy_packages_rhel8)
+          (is_on_rhel9 | bool) | ternary(sushy_packages_rhel9, sushy_packages_rhel8)
           ) }}"
         state: present
 
@@ -19,25 +19,22 @@
         - "{{ sushy_cert_dir }}"
         - "{{ sushy_data_dir }}"
 
+    - name: Install setuptools-rust and update pip in a virtual environment
+      pip:
+        name: ['setuptools-rust', 'pip']
+        virtualenv_command: "python3 -m venv"
+        extra_args: --upgrade
+        virtualenv: "{{ sushy_dir }}"
+
     - name: Install sushy-tools via pip in a virtual environment
       pip:
         name: "{{ sushy_pip_packages }}"
-        virtualenv_command: "{{ (is_on_rhel9 | bool) | ternary('python3 -m venv', omit) }}"
         virtualenv: "{{ sushy_dir }}"
 
     - name: Install httpd-tools for htpasswd
       package:
         name: httpd-tools
         state: present
-
-    - name: Add TCP firewall rules for VM bridge
-      firewalld:
-        port: "{{ item.0 }}/tcp"
-        state: enabled
-        zone: "{{ item.1 }}"
-        permanent: yes
-        immediate: yes
-      loop: "{{ [sushy_tools_port] | product(['internal', 'public']) | list }}"
 
     - name: Generate htpasswd entry
       command: htpasswd -bBn {{ bmc_user }} {{ bmc_password }}

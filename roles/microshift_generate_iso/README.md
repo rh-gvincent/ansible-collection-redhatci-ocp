@@ -16,10 +16,10 @@ The role requires the following variables to be defined:
 - `microshift_generate_iso_microshift_version`: The version of Microshift to use.
 
 - `microshift_generate_iso_localhost_folder`: The directory on the localhost where the ISO will be saved. Default is `"/tmp"`.
-- `microshift_generate_iso_microshift_iso_name`: Name of the iso in {{ microshift_generate_iso_localhost_folder }}. Default
+- `microshift_generate_iso_microshift_iso_name`: Name of the iso in {{ microshift_generate_iso_localhost_folder }}. Default `"microshift.iso"`
 - `microshift_generate_iso_fast_datapath_repo_url`: Fast data path repo url. Default is `"https://cdn.redhat.com/content/dist/layered/rhel{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/fast-datapath/os"`
 - `microshift_generate_iso_action`: Specifies the action to perform. Default is `"install"`.
-- `microshift_generate_iso_folder`: The directory where MicroShift files will be stored. Default is `"/home/{{ ansible_user }}/microshift"`.
+- `microshift_generate_iso_folder`: The directory where MicroShift files will be stored. Default is `"{{ ansible_user_dir }}/microshift"`.
 - `microshift_generate_iso_folder_blueprints_dir`: The directory within `microshift_generate_iso_folder` where blueprints will be stored. Default is `"{{ microshift_generate_iso_folder }}/blueprints"`.
 - `microshift_generate_iso_ssh_key`: The SSH public key to use for accessing servers. Default is the content of `~/.ssh/id_rsa.pub`.
 
